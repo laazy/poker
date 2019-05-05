@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class Table {
     private List<Poker> pokers = new ArrayList<Poker>();
-    private Map<Player, Pair<Poker, Poker>> playerHands;
+    private List<Player> players = new ArrayList<>();
 
     public Table() {
         for (PokerNumber i : PokerNumber.values()) {
