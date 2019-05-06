@@ -3,6 +3,9 @@ package com.kiwi.poker.controller;
 import com.kiwi.poker.service.TexasPokerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -12,8 +15,9 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-@ServerEndpoint("/websocket/{sid}")
+@ServerEndpoint("/websocket")
 @Component
+@RestController
 public class TexasPokerController {
     private final TexasPokerService texasPokerService;
 
@@ -27,12 +31,14 @@ public class TexasPokerController {
     }
 
     @OnOpen
-    public String enter(Session session) {
-        this.session = session;
-        webSocketSet.add(this);
-        String s = texasPokerService.enter(session.getId());
-        sendMessageToSet(s);
+    public String enter(Session session) throws IOException {
         return "success";
+//        this.session = session;
+//        webSocketSet.add(this);
+//        String s = texasPokerService.enter(session.getId());
+//        sendMessageToSet(s);
+//        sendMessage("success from server");
+//        return "success";
     }
 
     @OnMessage
