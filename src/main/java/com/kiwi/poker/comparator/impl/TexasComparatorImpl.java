@@ -3,6 +3,8 @@ package com.kiwi.poker.comparator.impl;
 import com.kiwi.poker.comparator.TexasComparator;
 import com.kiwi.poker.domain.Poker;
 import com.kiwi.poker.enumerate.TexasPokerRank;
+import com.kiwi.poker.texas.TexasPatternFactory;
+import com.kiwi.poker.texas.TexasPokerPattern;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -20,13 +22,7 @@ public class TexasComparatorImpl implements TexasComparator {
         if (p1.length != p2.length || p2.length != MAX_POKER_COMPARE){
             throw new IllegalArgumentException();
         }
-
-        TexasPokerRank r1 = PokerRankComparator.rank(p1),
-                r2 = PokerRankComparator.rank(p2);
-        if (r1 != r2){
-            return r1.compareTo(r2);
-        }
-        return getMaxPoker(p1).getNumber().compareTo(getMaxPoker(p2).getNumber());
+        return TexasPatternFactory.getPattern(p1).greatThan(TexasPatternFactory.getPattern(p2));
     }
 
     @Override
@@ -37,13 +33,4 @@ public class TexasComparatorImpl implements TexasComparator {
         return compare((Poker[])p1.toArray(), (Poker[])p2.toArray());
     }
 
-    private Poker getMaxPoker(@NotNull Poker[] p){
-        Poker tmp = p[0];
-        for (Poker i : p){
-            if (i.getNumber().compareTo(tmp.getNumber()) > 0){
-                tmp = i;
-            }
-        }
-        return tmp;
-    }
 }
