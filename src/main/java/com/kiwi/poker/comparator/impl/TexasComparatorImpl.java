@@ -2,9 +2,7 @@ package com.kiwi.poker.comparator.impl;
 
 import com.kiwi.poker.comparator.TexasComparator;
 import com.kiwi.poker.domain.Poker;
-import com.kiwi.poker.enumerate.TexasPokerRank;
 import com.kiwi.poker.texas.TexasPatternFactory;
-import com.kiwi.poker.texas.TexasPokerPattern;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
