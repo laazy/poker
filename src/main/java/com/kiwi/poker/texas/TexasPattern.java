@@ -165,7 +165,7 @@ public class TexasPattern {
 
     private boolean setPair(Poker[] p) {
         int pos;
-        for (pos = 0; pos < 3; pos++) {
+        for (pos = 0; pos <= 3; pos++) {
             if (p[pos].getNumber() == p[pos + 1].getNumber()) {
                 break;
             }
