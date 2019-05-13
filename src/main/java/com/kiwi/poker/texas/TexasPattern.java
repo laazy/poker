@@ -98,8 +98,8 @@ public class TexasPattern {
     }
 
     private boolean setStraight(Poker[] p) {
-        for (int i = 0; i < 3; i--) {
-            if (p[i].getNumber().ordinal() != p[i - 1].getNumber().ordinal() + 1) {
+        for (int i = 0; i < 3; i++) {
+            if (p[i].getNumber().ordinal() != p[i + 1].getNumber().ordinal() - 1) {
                 return false;
             }
         }
@@ -118,7 +118,7 @@ public class TexasPattern {
 
     private boolean setThreeKind(Poker[] p) {
         int pos;
-        for (pos = 0; pos < 2; pos++) {
+        for (pos = 0; pos <= 2; pos++) {
             if (p[pos].getNumber() == p[pos + 1].getNumber() && p[pos + 1].getNumber() == p[pos + 2].getNumber()) {
                 break;
             }
@@ -142,7 +142,7 @@ public class TexasPattern {
 
     private boolean setTwoPair(Poker[] p) {
         int pairCnt = 0;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i <= 3; i++) {
             if (p[i].getNumber() == p[i + 1].getNumber()) {
                 pairCnt++;
                 i++;
