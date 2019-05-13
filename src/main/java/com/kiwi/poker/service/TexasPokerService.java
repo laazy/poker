@@ -15,5 +15,4 @@ public interface TexasPokerService {
 
     String raise(String id, Integer chip);
 
-    Integer getOnlineNum();
 }

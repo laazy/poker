@@ -14,9 +14,11 @@ public class MessageHandler extends TextWebSocketHandler {
 
     // TODO: 这里没法自动注入，待修改
     private TexasPokerService texasPokerService = new TexasPokerServiceImpl();
+    private MessageManager messageManager = new MessageManager();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        messageManager.addUser(session.getId(), session);
         texasPokerService.enter(session.getId(), session);
         System.out.println("establish");
     }
@@ -29,6 +31,7 @@ public class MessageHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        messageManager.removeUser(session.getId());
         texasPokerService.quit(session.getId());
         System.out.println("close");
     }

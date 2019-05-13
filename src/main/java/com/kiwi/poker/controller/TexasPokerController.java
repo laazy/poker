@@ -17,7 +17,7 @@ public class TexasPokerController {
 
     @GetMapping("/onlinenum")
     public Integer getOnlineNum() {
-        return texasPokerService.getOnlineNum();
+        return 0;
     }
 
 }
