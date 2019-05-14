@@ -1,12 +1,15 @@
 package com.kiwi.poker.service.impl;
 
 import com.kiwi.poker.constant.Constant;
+import com.kiwi.poker.enumerate.TexasPokerRound;
 import com.kiwi.poker.service.TexasPokerService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
 public class TexasPokerServiceImpl implements TexasPokerService {
@@ -14,18 +17,21 @@ public class TexasPokerServiceImpl implements TexasPokerService {
 //    private static Map<String, WebSocketSession> onlineUsers = new ConcurrentHashMap<>();
 //    private static Map<String, Table> tables = new ConcurrentHashMap<>();
 
+    // Boolean indicates if the connection is established
+    private static Map<String, Boolean> connectedUsers = new ConcurrentHashMap<>();
+
     @Override
     public String enter(String id, WebSocketSession session) {
         return Constant.SUCCESS;
     }
 
     @Override
-    public String fold(String id) {
+    public String fold(String id, TexasPokerRound round) {
         return null;
     }
 
     @Override
-    public String raise(String id, Integer chip) {
+    public String raise(String id, Integer chip, TexasPokerRound round) {
         return null;
     }
 
