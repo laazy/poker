@@ -12,7 +12,7 @@ public class TexasPattern {
 
     private static final int PATTERN_MODIFIER = 0x100000;
 
-    private TexasPattern(Poker[] p) {
+    public TexasPattern(Poker[] p) {
         setPatternFromPoker(p);
     }
 
