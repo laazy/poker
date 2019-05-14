@@ -4,7 +4,9 @@ import com.kiwi.poker.domain.Poker;
 
 public class Player {
     private String id;
+    private Integer status;
     private Integer chips;
+    private Integer chipsInPot;
     private Poker poker1;
     private Poker poker2;
 

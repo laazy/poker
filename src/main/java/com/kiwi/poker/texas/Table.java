@@ -3,21 +3,31 @@ package com.kiwi.poker.texas;
 import com.kiwi.poker.domain.Poker;
 import com.kiwi.poker.enumerate.PokerNumber;
 import com.kiwi.poker.enumerate.Suit;
-import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Table {
-    private List<Poker> pokers = new ArrayList<Poker>();
-    private List<Player> players = new ArrayList<>();
+    private Integer tableStatus;  // ready? playing? waiting?
+    private List<Player> players = new ArrayList<>();  // If someone leave table, the corresponding item maybe null
+    private int btn;  // Index of btn player
+
+    private Game game;
 
     public Table() {
-        for (PokerNumber i : PokerNumber.values()) {
-            for (Suit j : Suit.values()) {
-                pokers.set(1, new Poker(j, i));
-            }
-        }
+
     }
+
+    public void playGame() {
+//        game.play(players, btn);
+    }
+
+    public void enterTable() {
+
+    }
+
+    public void quitTable() {
+
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.kiwi.poker.service.impl;
 
 import com.kiwi.poker.constant.Constant;
+import com.kiwi.poker.enumerate.TexasPokerRound;
 import com.kiwi.poker.service.TexasPokerService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
@@ -20,12 +21,12 @@ public class TexasPokerServiceImpl implements TexasPokerService {
     }
 
     @Override
-    public String fold(String id) {
+    public String fold(String id, TexasPokerRound round) {
         return null;
     }
 
     @Override
-    public String raise(String id, Integer chip) {
+    public String raise(String id, Integer chip, TexasPokerRound round) {
         return null;
     }
 
