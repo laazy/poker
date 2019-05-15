@@ -1,13 +1,16 @@
 package com.kiwi.poker.service;
 
-public interface UserService {
-    String login(String name, String pwd);
+import com.kiwi.poker.dto.auth.LoginForm;
+import com.kiwi.poker.dto.auth.LoginResponse;
+import com.kiwi.poker.dto.auth.RegisterForm;
+import com.kiwi.poker.dto.auth.RegisterResponse;
 
-    String register(String name, String pwd);
+public interface UserService {
+
 
     Integer getChips(String userId);
 
-    Integer setChips(String userId, Integer chips);
+    boolean setChips(String userId, Integer chips);
 
     /**
      * update chips when finishing a game
@@ -16,4 +19,8 @@ public interface UserService {
      * @return false iff cur_chips + delta < 0
      */
     boolean updateChips(String userId, Integer delta);
+
+    LoginResponse login(LoginForm form);
+
+    RegisterResponse register(RegisterForm form);
 }
