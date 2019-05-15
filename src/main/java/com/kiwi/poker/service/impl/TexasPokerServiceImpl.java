@@ -2,27 +2,33 @@ package com.kiwi.poker.service.impl;
 
 import com.kiwi.poker.constant.Constant;
 import com.kiwi.poker.enumerate.TexasPokerRound;
+import com.kiwi.poker.model.texaPoker.dto.GetTablesDto;
 import com.kiwi.poker.service.TexasPokerService;
+import com.kiwi.poker.texas.TexasTable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class TexasPokerServiceImpl implements TexasPokerService {
 
-//    private static Map<String, WebSocketSession> onlineUsers = new ConcurrentHashMap<>();
-//    private static Map<String, Table> tables = new ConcurrentHashMap<>();
-
-    // Boolean indicates if the connection is established
+    private static Map<Integer, TexasTable> tables = new ConcurrentHashMap<>();
     private static Map<String, Boolean> connectedUsers = new ConcurrentHashMap<>();
+    private static int maxTable = 0;
+    private Lock lock = new ReentrantLock();
 
     @Override
     public String enter(String id, WebSocketSession session) {
         return Constant.SUCCESS;
+    }
+
+    @Override
+    public GetTablesDto getTables() {
+        return null;
     }
 
     @Override
@@ -41,12 +47,30 @@ public class TexasPokerServiceImpl implements TexasPokerService {
     }
 
     @Override
-    public String sitdown(String id, String gameId) {
+    public String sitdown(String id, Integer tableId) {
         return null;
     }
 
     @Override
-    public String standup(String id, String gameId) {
+    public String standup(String id, Integer tableId) {
         return null;
+    }
+
+    private int nextTableId() {
+        try {
+            lock.lock();
+            return maxTable++;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public String newTable(String id) {
+        if (maxTable > Constant.MAX_TABLE) {
+            return Constant.FAILED;
+        }
+        tables.put(nextTableId(), new TexasTable());
+        return Constant.SUCCESS;
     }
 }
