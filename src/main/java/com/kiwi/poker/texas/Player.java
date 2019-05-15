@@ -33,6 +33,11 @@ public class Player {
         return poker2;
     }
 
+    public void setPoker(Poker p1, Poker p2){
+        this.poker1 = p1;
+        this.poker2 = p2;
+    }
+
     public boolean raise(Integer i){
         if (chips < i){
             return false;

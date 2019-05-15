@@ -3,29 +3,34 @@ package com.kiwi.poker.texas;
 import com.kiwi.poker.domain.Poker;
 import com.kiwi.poker.enumerate.PokerNumber;
 import com.kiwi.poker.enumerate.Suit;
-import com.kiwi.poker.enumerate.TexasPokerStatus;
 
 import java.util.*;
 
-public class Game {
-    private Map<Poker, TexasPokerStatus> deck = new HashMap<>();
+public class Game implements Runnable {
+    /**
+     * The status of Poker has several types below:
+     * 0: for free, it's still covered
+     * 1: public, it's in public deck
+     * 2~n, in players
+     *
+     */
+    private Set<Poker> deck = new HashSet<>();
+    private List<Player> players;
+    private Integer btn;
     private Poker[] publicCards = new Poker[5];
 
-    public Game() {
-        for (PokerNumber pn : PokerNumber.values()) {
-            for (Suit s : Suit.values()) {
-                deck.put(new Poker(s, pn), TexasPokerStatus.FREE);
-            }
-        }
-    }
 
-    private List<Player> gamePlayers;
-    private int gameBtn;
+    private static final int INIT_PUBLIC = 3;
+
+    public Game() {
+    }
 
     // contains main pot and side pots
     private List<Pot> pots = new ArrayList<>();
 
-    public void play(List<Player> players, Player btn) {
+    public void play(List<Player> players, Integer btn) {
+        this.players = players;
+        this.btn = btn;
         initGame();
         initPlayerHands();
         preflop();
@@ -35,11 +40,26 @@ public class Game {
         endGame();
     }
 
+//    public static void main(String[] args) {
+//        Map<Poker, TexasPokerStatus> deck = new HashMap<>();
+//        Poker p = new Poker(Suit.SPADE, PokerNumber.POKER_A);
+//        deck.put(p, TexasPokerStatus.FREE);
+//        deck.put(p, TexasPokerStatus.EIGHTH);
+//        System.out.println(deck.size());
+//    }
+
     private void initGame() {
+        for (Suit s: Suit.values()){
+            for (PokerNumber pn : PokerNumber.values()){
+                deck.add(new Poker(s, pn));
+            }
+        }
     }
 
     private void initPlayerHands() {
-
+        for (Player p : players){
+            p.setPoker(pollRandomPoker(), pollRandomPoker());
+        }
     }
 
     private void preflop() {
@@ -62,21 +82,21 @@ public class Game {
 
     }
 
-    private Poker getRandomPoker() {
-        Set<Poker> pokers = deck.keySet();
-        int randomIndex = new Random().nextInt(pokers.size());
-        Poker ans = null;
-        for (Poker p : pokers) {
+    private Poker pollRandomPoker() {
+        int randomIndex = new Random().nextInt(deck.size());
+        for (Poker p : deck) {
             if (randomIndex == 0) {
-                ans = p;
-                break;
+                deck.remove(p);
+                return p;
             }
             randomIndex--;
         }
-        if (ans == null){
-            throw new RuntimeException("Game: deck has no key");
-        }
-        return ans;
+        throw new RuntimeException("Game: deck has no key");
+    }
+
+    @Override
+    public void run() {
+
     }
 
     private boolean isRaiseValid() {
