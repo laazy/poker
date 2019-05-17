@@ -5,10 +5,12 @@ import com.kiwi.poker.domain.Poker;
 import com.kiwi.poker.enumerate.PokerNumber;
 import com.kiwi.poker.enumerate.Suit;
 import com.kiwi.poker.enumerate.TexasOperation;
+import com.kiwi.poker.enumerate.TexasPlayerStatus;
 
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,10 +26,14 @@ public class Game implements Runnable {
 
     private List<Player> players;
     private Integer btn;
+    private Integer smallBlind;
+    private static final Integer blind = 200;
 
     private Lock opLock = new ReentrantLock();
     private Condition opCond = opLock.newCondition();
     private Player waitingPlayer;
+    private Player lastPlayer;
+    private boolean opDone;
     private Integer currentBet = 0;
 
     private Poker[] publicCards = new Poker[5];
@@ -37,14 +43,16 @@ public class Game implements Runnable {
     // contains main pot and side pots
 //    private List<Pot> pots = new ArrayList<>();
     // use simplest pot for now
-    Pot pot = new Pot();
+    private Pot pot = new Pot();
 
     public Game() {
+//        smallBlind = 0;
     }
 
     public void play(List<Player> players, Integer btn) {
         this.players = players;
         this.btn = btn;
+        this.smallBlind = (btn + 1) % players.size();
         initGame();
         initPlayerHands();
         preflop();
@@ -54,36 +62,45 @@ public class Game implements Runnable {
         endGame();
     }
 
-//    public static void main(String[] args) {
+    //    public static void main(String[] args) {
 //        Map<Poker, TexasPokerStatus> deck = new HashMap<>();
 //        Poker p = new Poker(Suit.SPADE, PokerNumber.POKER_A);
 //        deck.put(p, TexasPokerStatus.FREE);
 //        deck.put(p, TexasPokerStatus.EIGHTH);
 //        System.out.println(deck.size());
 //    }
-
-    private void askRound(Integer begin, Integer leastBet){
-        try {
-            opLock.lock();
-            Integer i = (begin + players.size() - 1) % players.size();
-            currentBet = leastBet;
-            waitingPlayer = players.get(begin);
+    private void askRound(Integer begin, Integer leastBet) {
+        waitingPlayer = players.get(begin);
+        lastPlayer = waitingPlayer;
+        do {
             try {
-                opCond.await(Constant.MAX_AWAIT_TIME, Constant.TIME_UNIT);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                opLock.lock();
+                currentBet = leastBet;
+                if (waitingPlayer.getStatus() != TexasPlayerStatus.ON_DECK) {
+                    continue;
+                }
+                opDone = false;
+                try {
+                    opCond.await(Constant.MAX_AWAIT_TIME, Constant.TIME_UNIT);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (!opDone) {
+                    // follow current round if timeout
+                    follow();
+                }
+            } finally {
+                begin = (begin + 1) % players.size();
+                waitingPlayer = players.get(begin);
+                opLock.unlock();
             }
-
-
-        } finally {
-            opLock.unlock();
-        }
+        } while (waitingPlayer != lastPlayer);
     }
 
     public void operation(String id, TexasOperation op, Integer money) {
         try {
             opLock.lock();
-            if (!waitingPlayer.getId().equals(id)) {
+            if (!waitingPlayer.getId().equals(id) || opDone) {
                 return;
             }
             switch (op) {
@@ -91,10 +108,12 @@ public class Game implements Runnable {
                     fold();
                     break;
                 case FOLLEW:
-                    follew();
+                    if (waitingPlayer.getChips() >= currentBet) {
+                        follow();
+                    }
                     break;
                 case RAISE:
-                    if (money >= currentBet) {
+                    if (money >= currentBet && waitingPlayer.getChips() > money) {
                         raise(money);
                     }
                     break;
@@ -102,25 +121,36 @@ public class Game implements Runnable {
                     allIn();
                     break;
             }
+            opDone = true;
         } finally {
             opLock.unlock();
         }
     }
 
-    void fold() {
-
+    private void fold() {
+        waitingPlayer.setStatus(TexasPlayerStatus.FOLDED);
     }
 
-    void follew() {
-
+    private void follow() {
+        pot.bet(waitingPlayer, currentBet);
+        waitingPlayer.pollChips(currentBet);
     }
 
-    void raise(Integer money) {
-
+    private void raise(Integer money) {
+        pot.bet(waitingPlayer, money);
+        currentBet = money;
+        waitingPlayer.pollChips(money);
+        lastPlayer = waitingPlayer;
     }
 
-    void allIn() {
-
+    private void allIn() {
+        pot.bet(waitingPlayer, waitingPlayer.getChips());
+        if (currentBet < waitingPlayer.getChips()) {
+            currentBet = waitingPlayer.getChips();
+        }
+        waitingPlayer.pollChips(waitingPlayer.getChips());
+        waitingPlayer.setStatus(TexasPlayerStatus.ALL_IN);
+        lastPlayer = waitingPlayer;
     }
 
     private void initGame() {
@@ -137,24 +167,42 @@ public class Game implements Runnable {
         }
     }
 
-    private void preflop() {
+    private void takeBlind(Player player, Integer blind) {
+        if (player.getChips() < blind) {
+            player.pollChips(player.getChips());
+            player.setStatus(TexasPlayerStatus.ALL_IN);
+        } else {
+            player.pollChips(blind);
+        }
+    }
 
+    private void preflop() {
+        Player smallBlind = players.get(this.smallBlind),
+                bigBlind = players.get((btn + 2) % players.size());
+        takeBlind(smallBlind, blind);
+        takeBlind(bigBlind, 2 * blind);
+        askRound((btn + 3) % players.size(), blind);
     }
 
     private void flop() {
-
+        publicCards[0] = pollRandomPoker();
+        publicCards[1] = pollRandomPoker();
+        publicCards[2] = pollRandomPoker();
+        askRound(smallBlind, blind);
     }
 
     private void turn() {
-
+        publicCards[3] = pollRandomPoker();
+        askRound(smallBlind, blind);
     }
 
     private void river() {
-
+        publicCards[4] = pollRandomPoker();
+        askRound(smallBlind, blind);
     }
 
     private void endGame() {
-
+        
     }
 
     private Poker pollRandomPoker() {

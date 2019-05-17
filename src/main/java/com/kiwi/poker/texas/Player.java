@@ -1,20 +1,28 @@
 package com.kiwi.poker.texas;
 
 import com.kiwi.poker.domain.Poker;
+import com.kiwi.poker.enumerate.TexasPlayerStatus;
 
 public class Player {
     private String id;
-    private Integer status;
+    private TexasPlayerStatus status;
     private Integer chips;
     private Integer chipsInPot;
     private Poker poker1;
     private Poker poker2;
 
-    public Player(String id, Integer chips, Poker poker1, Poker poker2) {
+    public Player(String id, Integer chips) {
         this.id = id;
         this.chips = chips;
-        this.poker1 = poker1;
-        this.poker2 = poker2;
+        this.status = TexasPlayerStatus.ON_DECK;
+    }
+
+    public TexasPlayerStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TexasPlayerStatus status) {
+        this.status = status;
     }
 
     public String getId() {
@@ -23,6 +31,11 @@ public class Player {
 
     public Integer getChips() {
         return chips;
+    }
+
+    public void pollChips(Integer chips){
+        this.chips -= chips;
+        this.chipsInPot += chips;
     }
 
     public Poker getPoker1() {
@@ -36,13 +49,5 @@ public class Player {
     public void setPoker(Poker p1, Poker p2){
         this.poker1 = p1;
         this.poker2 = p2;
-    }
-
-    public boolean raise(Integer i){
-        if (chips < i){
-            return false;
-        }
-        chips -= i;
-        return true;
     }
 }

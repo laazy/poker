@@ -40,7 +40,7 @@ public class TexasTable implements Table {
                     return Constant.FAILED;
                 }
             }
-            players[pos] = new Player(id, null, null, null);
+            players[pos] = new Player(id, null);
             currentPlays++;
             return Constant.SUCCESS;
         } finally {
