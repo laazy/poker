@@ -2,4 +2,4 @@ pipeline:
   build:
     image: java:openjdk-8
   command:
-    mvn package
+    - mvn package
