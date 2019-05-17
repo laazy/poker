@@ -16,7 +16,7 @@ public class MessageManager {
     }
 
     public void removeUser(String userId) {
-        users.remove(userId);
+//        users.remove(userId);
     }
 
     public void sendMessageTo(Collection<String> receivers, String msg) throws IOException {

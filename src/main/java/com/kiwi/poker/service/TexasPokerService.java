@@ -1,5 +1,6 @@
 package com.kiwi.poker.service;
 
+import com.kiwi.poker.enumerate.TexasPokerRound;
 import org.springframework.web.socket.WebSocketSession;
 
 public interface TexasPokerService {
@@ -11,8 +12,8 @@ public interface TexasPokerService {
 
     String standup(String id, String gameId);
 
-    String fold(String id);
+    String fold(String id, TexasPokerRound round);
 
-    String raise(String id, Integer chip);
+    String raise(String id, Integer chip, TexasPokerRound round);
 
 }

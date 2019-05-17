@@ -18,8 +18,10 @@ public class MessageHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        messageManager.addUser(session.getId(), session);
-        texasPokerService.enter(session.getId(), session);
+        String userId = (String) session.getAttributes().get("userId");
+        System.out.println("userId: " + userId);
+//        messageManager.addUser(session.getId(), session);
+//        texasPokerService.enter(session.getId(), session);
         System.out.println("establish");
     }
 
@@ -31,8 +33,8 @@ public class MessageHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        messageManager.removeUser(session.getId());
-        texasPokerService.quit(session.getId());
+//        messageManager.removeUser(session.getId());
+//        texasPokerService.quit(session.getId());
         System.out.println("close");
     }
 }
