@@ -1,5 +1,7 @@
 package com.kiwi.poker.texas;
 
+import com.kiwi.poker.comparator.TexasComparator;
+import com.kiwi.poker.comparator.impl.TexasComparatorImpl;
 import com.kiwi.poker.constant.Constant;
 import com.kiwi.poker.domain.Poker;
 import com.kiwi.poker.enumerate.PokerNumber;
@@ -7,10 +9,7 @@ import com.kiwi.poker.enumerate.Suit;
 import com.kiwi.poker.enumerate.TexasOperation;
 import com.kiwi.poker.enumerate.TexasPlayerStatus;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -201,8 +200,74 @@ public class Game implements Runnable {
         askRound(smallBlind, blind);
     }
 
+    class StupidCombine {
+        TexasComparator comparator = new TexasComparatorImpl();
+
+        private Poker[][] pickThreeConbineFromPublic() {
+            Poker[][] ans = new Poker[20][];
+            for (int p = 0; p < 20; p++)
+                for (int i = 0; i < 5; i++)
+                    for (int j = i + 1; j < 5; j++)
+                        for (int k = j + 1; k < 5; k++)
+                            ans[p] = new Poker[]{publicCards[i], publicCards[k], publicCards[k], null, null};
+            return ans;
+        }
+
+        private Poker[][] getPlayerCards(Player player) {
+            Poker[][] playerCards = pickThreeConbineFromPublic();
+            for (int i = 0; i < 20; i++) {
+                playerCards[i][3] = player.getPoker1();
+                playerCards[i][4] = player.getPoker2();
+                Arrays.sort(playerCards[i]);
+            }
+            return playerCards;
+        }
+
+        private Poker[] getPlayerMaxCards(Player player) {
+            Poker[][] allPossible = getPlayerCards(player);
+            Poker[] max = allPossible[0];
+            for (int i = 1; i < 20; i++) {
+                if (comparator.compare(allPossible[i], max) > 0) {
+                    max = allPossible[0];
+                }
+            }
+            return max;
+        }
+
+
+        public List<Player> getWinner() {
+            List<Player> candidate = new ArrayList<>();
+            List<Poker[]> candidateCards = new ArrayList<>();
+            for (Player i : players) {
+                if (i.getStatus() == TexasPlayerStatus.ON_DECK) {
+                    candidate.add(i);
+                    candidateCards.add(getPlayerMaxCards(i));
+                }
+            }
+            for (int i = 0; i < candidate.size(); i++) {
+                for (int j = i + 1; j < candidate.size(); j++) {
+                    if (comparator.compare(candidateCards.get(j), candidateCards.get(i)) > 0){
+                        {
+                            Poker[] tmp = candidateCards.get(j);
+                            candidateCards.set(j, candidateCards.get(i));
+                            candidateCards.set(i, tmp);
+                        }
+                        {
+                            Player tmp = candidate.get(j);
+                            candidate.set(j, candidate.get(i));
+                            candidate.set(i, tmp);
+                        }
+                    }
+                }
+            }
+            return candidate;
+        }
+    }
+
     private void endGame() {
-        
+        StupidCombine sc = new StupidCombine();
+        List<Player> winners = sc.getWinner();
+        pot.win(winners);
     }
 
     private Poker pollRandomPoker() {
