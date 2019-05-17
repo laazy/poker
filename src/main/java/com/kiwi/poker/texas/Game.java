@@ -14,7 +14,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Game implements Runnable {
+public class Game {
     /**
      * The status of Poker has several types below:
      * 0: for free, it's still covered
@@ -37,44 +37,21 @@ public class Game implements Runnable {
 
     private Poker[] publicCards = new Poker[5];
 
-    private static final int INIT_PUBLIC = 3;
-
-    // contains main pot and side pots
-//    private List<Pot> pots = new ArrayList<>();
-    // use simplest pot for now
     private Pot pot = new Pot();
 
-    public Game() {
-//        smallBlind = 0;
-    }
-
-    public void play(List<Player> players, Integer btn) {
+    public Game(List<Player> players, Integer btn) {
         this.players = players;
         this.btn = btn;
         this.smallBlind = (btn + 1) % players.size();
-        initGame();
-        initPlayerHands();
-        preflop();
-        flop();
-        turn();
-        river();
-        endGame();
     }
 
-    //    public static void main(String[] args) {
-//        Map<Poker, TexasPokerStatus> deck = new HashMap<>();
-//        Poker p = new Poker(Suit.SPADE, PokerNumber.POKER_A);
-//        deck.put(p, TexasPokerStatus.FREE);
-//        deck.put(p, TexasPokerStatus.EIGHTH);
-//        System.out.println(deck.size());
-//    }
-    private void askRound(Integer begin, Integer leastBet) {
+    private void askRound(Integer begin) {
         waitingPlayer = players.get(begin);
         lastPlayer = waitingPlayer;
         do {
             try {
                 opLock.lock();
-                currentBet = leastBet;
+                currentBet = Game.blind;
                 if (waitingPlayer.getStatus() != TexasPlayerStatus.ON_DECK) {
                     continue;
                 }
@@ -180,24 +157,24 @@ public class Game implements Runnable {
                 bigBlind = players.get((btn + 2) % players.size());
         takeBlind(smallBlind, blind);
         takeBlind(bigBlind, 2 * blind);
-        askRound((btn + 3) % players.size(), blind);
+        askRound((btn + 3) % players.size());
     }
 
     private void flop() {
-        publicCards[0] = pollRandomPoker();
-        publicCards[1] = pollRandomPoker();
-        publicCards[2] = pollRandomPoker();
-        askRound(smallBlind, blind);
+        for (int i = 0; i < 3; i++){
+            publicCards[i] = pollRandomPoker();
+        }
+        askRound(smallBlind);
     }
 
     private void turn() {
         publicCards[3] = pollRandomPoker();
-        askRound(smallBlind, blind);
+        askRound(smallBlind);
     }
 
     private void river() {
         publicCards[4] = pollRandomPoker();
-        askRound(smallBlind, blind);
+        askRound(smallBlind);
     }
 
     class StupidCombine {
@@ -235,7 +212,7 @@ public class Game implements Runnable {
         }
 
 
-        public List<Player> getWinner() {
+        List<Player> getWinner() {
             List<Player> candidate = new ArrayList<>();
             List<Poker[]> candidateCards = new ArrayList<>();
             for (Player i : players) {
@@ -246,7 +223,7 @@ public class Game implements Runnable {
             }
             for (int i = 0; i < candidate.size(); i++) {
                 for (int j = i + 1; j < candidate.size(); j++) {
-                    if (comparator.compare(candidateCards.get(j), candidateCards.get(i)) > 0){
+                    if (comparator.compare(candidateCards.get(j), candidateCards.get(i)) > 0) {
                         {
                             Poker[] tmp = candidateCards.get(j);
                             candidateCards.set(j, candidateCards.get(i));
@@ -282,9 +259,14 @@ public class Game implements Runnable {
         throw new RuntimeException("Game: deck has no key");
     }
 
-    @Override
-    public void run() {
-
+    public void play() {
+        initGame();
+        initPlayerHands();
+        preflop();
+        flop();
+        turn();
+        river();
+        endGame();
     }
 }
 

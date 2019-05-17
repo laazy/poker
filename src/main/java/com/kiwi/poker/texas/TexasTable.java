@@ -76,9 +76,7 @@ public class TexasTable implements Table {
                 curPlayers.add(players[i]);
             }
         }
-        game.play(curPlayers, 0);
-//        gameThread = new Thread(game);
-//        gameThread.run();
+        game = new Game(curPlayers, 0);
     }
 
     @Override
