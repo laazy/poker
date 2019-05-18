@@ -9,6 +9,10 @@ steps:
     volumes:
     - name: maven-cache
       path: /root/.m2
+    when:
+      branch:
+      - master
+      - dev
 
 volumes:
 - name: maven-cache
