@@ -1,0 +1,16 @@
+kind: pipeline
+name: Poker
+
+steps:
+  - name: compile
+    image: maven:3.6.0-jdk-8-alpine
+    commands:
+    - mvn package
+    volumes:
+    - name: maven-cache
+      path: /root/.m2
+
+volumes:
+- name: maven-cache
+  host:
+    path: /home/centos/.maven/cache
