@@ -13,7 +13,6 @@ public class TexasComparatorImpl implements TexasComparator {
     @Override
     public int compare(Poker p1, Poker p2) {
         return p1.getNumber().compareTo(p2.getNumber());
-        
     }
 
     @Override
