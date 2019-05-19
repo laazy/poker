@@ -2,9 +2,18 @@ kind: pipeline
 name: Poker
 
 steps:
+  - name: test-database
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+    command: --character-set-server=utf8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: poker
   - name: compile
     image: maven:3.6.0-jdk-8-alpine
     commands:
+    mv src/main/resources/application.properties.test src/main/resources/application.properties
     - mvn package
     volumes:
     - name: maven-cache
