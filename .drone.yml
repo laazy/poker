@@ -13,7 +13,7 @@ steps:
   - name: compile
     image: maven:3.6.0-jdk-8-alpine
     commands:
-    mv src/main/resources/application.properties.test src/main/resources/application.properties
+    - mv src/main/resources/application.properties.test src/main/resources/application.properties
     - mvn package
     volumes:
     - name: maven-cache
