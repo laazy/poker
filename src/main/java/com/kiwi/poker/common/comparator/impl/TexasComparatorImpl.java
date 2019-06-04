@@ -1,6 +1,6 @@
-package com.kiwi.poker.comparator.impl;
+package com.kiwi.poker.common.comparator.impl;
 
-import com.kiwi.poker.comparator.TexasComparator;
+import com.kiwi.poker.common.comparator.TexasComparator;
 import com.kiwi.poker.domain.Poker;
 import com.kiwi.poker.texas.TexasPattern;
 

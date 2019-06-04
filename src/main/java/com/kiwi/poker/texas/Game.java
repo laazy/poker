@@ -1,7 +1,7 @@
 package com.kiwi.poker.texas;
 
-import com.kiwi.poker.comparator.TexasComparator;
-import com.kiwi.poker.comparator.impl.TexasComparatorImpl;
+import com.kiwi.poker.common.comparator.TexasComparator;
+import com.kiwi.poker.common.comparator.impl.TexasComparatorImpl;
 import com.kiwi.poker.constant.Constant;
 import com.kiwi.poker.domain.Poker;
 import com.kiwi.poker.enumerate.PokerNumber;

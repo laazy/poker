@@ -1,4 +1,4 @@
-package com.kiwi.poker.comparator;
+package com.kiwi.poker.common.comparator;
 
 import com.kiwi.poker.domain.Poker;
 

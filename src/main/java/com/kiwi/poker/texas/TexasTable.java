@@ -25,6 +25,18 @@ public class TexasTable implements Table {
 
     }
 
+    public TableStatus getTableStatus() {
+        return tableStatus;
+    }
+
+    public int getPlaysNumer() {
+        return currentPlays;
+    }
+
+    public int getMaxPlayers(){
+        return Constant.MAX_PLAYER;
+    }
+
     @Override
     public String addPlayer(String id, Integer pos) {
         if (tableStatus != TableStatus.WAITING) {
